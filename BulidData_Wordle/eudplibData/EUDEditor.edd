@@ -1,0 +1,48 @@
+[main]
+input: F:\StarCraft\Maps\Wordle\[EUD]한글워들.scx
+output: F:\StarCraft\Maps\Wordle\[EUD]한글워들_output.scx
+[DataEditor.py]
+[ExtraDataEditor.py]
+[dataDumper]
+
+[TriggerEditor\main.eps]
+
+
+[chatEvent]
+__addr__ : 0x58D900
+__ptrAddr__ : 0x58D904
+__patternAddr__ : 0x58D908
+__lenAddr__ : 0x58D90C
+
+
+[MSQC]
+QCDebug : False
+q; NotTyping : A Key1, 1
+w; NotTyping : A Key1, 2
+e; NotTyping : A Key1, 4
+r; NotTyping : A Key1, 8
+t; NotTyping : A Key1, 16
+y; NotTyping : A Key1, 32
+u; NotTyping : A Key1, 64
+i; NotTyping : A Key1, 128
+o; NotTyping : A Key1, 256
+p; NotTyping : A Key2, 1
+a; NotTyping : A Key2, 2
+s; NotTyping : A Key2, 4
+d; NotTyping : A Key2, 8
+f; NotTyping : A Key2, 16
+g; NotTyping : A Key2, 32
+h; NotTyping : A Key2, 64
+j; NotTyping : A Key2, 128
+k; NotTyping : A Key2, 256
+l; NotTyping : A Key3, 1
+z; NotTyping : A Key3, 2
+x; NotTyping : A Key3, 4
+c; NotTyping : A Key3, 8
+v; NotTyping : A Key3, 16
+b; NotTyping : A Key3, 32
+n; NotTyping : A Key3, 64
+m; NotTyping : A Key3, 128
+`; NotTyping : A Key4, 1
+KeyPress(BACK); NotTyping : A Key4, 2
+

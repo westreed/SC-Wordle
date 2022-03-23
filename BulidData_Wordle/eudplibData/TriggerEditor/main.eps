@@ -1,0 +1,21 @@
+import PluginVariables as msqcvar;
+import System.gameIng as sgi;
+
+const t = StringBuffer(1024);
+function onPluginStart(){
+
+	randomize();
+	foreach(cp : EUDLoopPlayer("Human")){
+		setcurpl(cp);
+	}
+}
+
+function beforeTriggerExec(){
+
+	SetMemory(0x6509A0, SetTo, 0); //EUD터보
+	sgi.gameSystem();
+}
+
+function afterTriggerExec(){
+
+}

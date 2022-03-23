@@ -1,0 +1,85 @@
+import System.word as sw;
+import System.keyInput as ski;
+import System.keyboard as skb;
+import Player.scoreBoard as psb;
+import variables as v;
+
+const t = StringBuffer();
+var   gameStep          = 1;
+var   nextIndex         = 0;
+const duplicateQuestion = EUDArray(100);
+
+
+function newQuestion(){
+    while(true){
+        var check = true;
+        const rand = 1 + dwrand() % sw.wordMAX;
+        for (var i=0; i<nextIndex; i++){
+            if(MemoryEPD(EPD(duplicateQuestion)+i, Exactly, rand)){
+                check = false;
+                break;
+            }
+        }
+        if(check){
+            duplicateQuestion[nextIndex] = rand;
+            nextIndex++;
+            SetVariables(ski.question, rand-1);
+            gameStep += 1;
+            break;
+        }
+    }
+}
+
+function removeText(){
+    setcurpl(getuserplayerid());
+    t.print("\n\n\n\n\n\n\n\n\n\n\n");
+    setcurpl(0);
+}
+
+function mainPlayer(){
+    var uN = 0;
+    foreach(cp : EUDLoopPlayer("Human")){
+        uN += 1;
+        if(Deaths(Force1, Exactly, 0, 215)){
+            SetDeaths(cp, SetTo, 1, 215);
+            SetVariables(v.superUser, cp);
+        }
+    }
+    if(v.userNumber != uN){
+        SetVariables(v.userNumber, uN);
+    }
+}
+
+function gameSystem(){
+    mainPlayer();
+    if(gameStep == 0){
+        newQuestion();
+    }
+    else if(gameStep == 1){
+        foreach(cp : EUDLoopPlayer("Human")){
+            setcurpl(cp);
+            ski.keywordUpdate[cp] = 1;
+            skb.keyboardUpdate[cp] = 1;
+            SetDeaths(cp, SetTo, 1, "A Check");
+        }
+        gameStep += 1;
+    }
+    else if(gameStep == 2){
+        foreach(cp : EUDLoopPlayer("Human")){
+            setcurpl(cp);
+            ski.keyInputSystem(cp);
+        }
+        if(psb.clear == v.userNumber || Deaths(Force1, Exactly, 0, "A Check")){
+            gameStep += 1;
+        }
+    }
+    else if(gameStep == 3){
+        removeText();
+        gameStep += 1;
+    }
+    else if(gameStep == 4){
+        psb.resetScoreData();
+        ski.resetKeywordData();
+        gameStep = 0;
+    }
+}

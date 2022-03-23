@@ -1,0 +1,29 @@
+
+const phonemesList  = [
+    Db('ㅂ'), Db('ㅈ'), Db('ㄷ'), Db('ㄱ'), Db('ㅅ'), Db('ㅛ'), Db('ㅕ'), Db('ㅑ'), Db('ㅐ'), Db('ㅔ'), Db('ㅁ'), Db('ㄴ'), Db('ㅇ'),
+    Db('ㄹ'), Db('ㅎ'), Db('ㅗ'), Db('ㅓ'), Db('ㅏ'), Db('ㅣ'), Db('ㅋ'), Db('ㅌ'), Db('ㅊ'), Db('ㅍ'), Db('ㅠ'), Db('ㅜ'), Db('ㅡ')
+];
+
+const phonemesValue = [
+    0x8285E3, 0x8885E3, 0xB784E3, 0xB184E3, 0x8585E3, 0x9B85E3, 0x9585E3, 0x9185E3, 0x9085E3, 0x9485E3, 0x8185E3, 0xB484E3, 0x8785E3,
+    0xB984E3, 0x8E85E3, 0x9785E3, 0x9385E3, 0x8F85E3, 0xA385E3, 0x8B85E3, 0x8C85E3, 0x8A85E3, 0x8D85E3, 0xA085E3, 0x9C85E3, 0xA185E3
+];
+// 0xE38582, 0xE38588, 0xE384B7, 0xE384B1, 0xE38585, 0xE3859B, 0xE38595, 0xE38591, 0xE38590, 0xE38594, 0xE38581, 0xE384B4, 0xE38587,
+// 0xE384B9, 0xE3858E, 0xE38597, 0xE38593, 0xE3858F, 0xE385A3, 0xE3858B, 0xE3858C, 0xE3858A, 0xE3858D, 0xE385A0, 0xE3859C, 0xE385A1
+
+const phonemesKeys  = [
+    1, 2, 4, 8, 16, 32, 64, 128, 256, 1, 2, 4, 8, 16, 32, 64, 128, 256, 1, 2, 4, 8, 16, 32, 64, 128
+];
+
+const phonemesName  = [
+    $U("A Key1"), $U("A Key1"), $U("A Key1"), $U("A Key1"), $U("A Key1"), $U("A Key1"), $U("A Key1"), $U("A Key1"), $U("A Key1"), $U("A Key2"), $U("A Key2"), $U("A Key2"), $U("A Key2"), $U("A Key2"), $U("A Key2"), $U("A Key2"), $U("A Key2"), $U("A Key2"), $U("A Key3"), $U("A Key3"), $U("A Key3"), $U("A Key3"), $U("A Key3"), $U("A Key3"), $U("A Key3"), $U("A Key3")
+];
+
+// ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅅ, ㅇ, ㅈ, ㅊ, ㅋ, ㅌ, ㅍ, ㅎ,
+// ㅏ, ㅐ, ㅑ, ㅓ, ㅔ, ㅕ, ㅗ, ㅛ, ㅜ, ㅠ, ㅡ, ㅣ
+const phonemesOrder = [
+     5,  8,  2,  0,  6, 21, 19, 16, 15, 18,  4,  1,  7,  3,
+    13, 20, 17, 14, 25, 10, 11,  9, 12, 23, 22, 24
+];
+
+const phonemesNumber = phonemesList._arrlen;

@@ -1,0 +1,260 @@
+import System.phonemes as sp;
+import System.word as sw;
+import System.keyboard as skb;
+import Player.scoreBoard as psb;
+import variables as v;
+
+const s = StringBuffer(1024);
+
+var   question          = 1254; //문제의 번호
+const keywordNumber     = 30;
+const keywordUse        = PVariable();
+const keywordUpdate     = PVariable();
+const keywordIndex      = PVariable();
+const keywordLine       = PVariable();
+const keywordArray      = EUDArray(8*keywordNumber);
+const keywordColor      = EUDArray(8*keywordNumber);
+const keywordDelay      = PVariable();
+const keywordInput      = PVariable();
+const keyboardColor     = EUDArray(8*26); //각 초성별 색상
+
+
+function stopKeyword(cp){
+    SetDeaths(cp, SetTo, 0, "A Check");
+    keywordUse[cp] = 1;
+}
+
+// 단어리스트에 있는 단어인지 검색하기
+function checkKeyword(cp){
+    const cpk = cp*keywordNumber;
+    const wordLine = keywordLine[cp]*5;
+    const firstLetter = sp.phonemesOrder[keywordArray[cpk+wordLine+0]-1];
+    // 첫번째 단어가 어떤 초성인지 분석하기
+    var firstIndex = 0;
+    var searchRange = 0;
+    for (var i=0; i<14; i++){
+        searchRange = sw.wordNumber[i];
+        if(firstLetter == i){break;}
+        else{firstIndex += sw.wordNumber[i];}
+    }
+    // firstIndex를 기준으로 값 찾기
+    var wordIndex = 0;
+    for (var i=0; i<searchRange; i++){
+        wordIndex = firstIndex+i;
+        if(wordIndex == sw.wordMAX-2){break;}
+        var check = true;
+        const word = sw.wordList[wordIndex];
+        // s.printf("검색중... {:s} 0x{:x}", word, word);
+        for (var j=0; j<5; j++){
+            const value = sp.phonemesValue[keywordArray[cpk+wordLine+j]-1];
+            if(!MemoryXEPD(EPD(word)+j, Exactly, value, 0xFFFFFF)){
+                check = false;
+                break;
+            }
+        }
+        if(check){
+            // 정답과 일치
+            if(question == wordIndex){return 2;}
+            // 단어리스트에 존재
+            else{return 1;}
+        }
+    }
+    return 0;
+}
+
+function nextLine(cp){
+    const wordNum  = EUDArray(26);
+    const wordIndex = EUDArray(5);
+    for (var i=0; i<26; i++){
+        wordNum[i] = 0;
+        if(i<5){wordIndex[i] = 0;}
+    }
+    const answer = sw.wordList[question];
+    // 정답 글자 분해
+    for (var i=0; i<5; i++){
+        for (var j=0; j<26; j++){
+            if(MemoryXEPD(EPD(answer)+i, Exactly, sp.phonemesValue[j], 0xFFFFFF)){
+                wordNum[j] += 1; //wordNum[0~25]
+                wordIndex[i] = j+1; //wordIndex[0~5] = 1~26
+                break;
+            }
+        }
+    }
+    const cpk = cp*keywordNumber;
+    const cpb = cp*26;
+    const wordLine = keywordLine[cp]*5;
+    // 내 글자 해석
+    for (var i=0; i<5; i++){
+        const myIndex = keywordArray[cpk+wordLine+i]; //1~26
+        const myWord = sp.phonemesList[myIndex-1]; //ㅂ,ㅈ,ㄷ,ㄱ,...
+        // const myValue = maskread_epd(EPD(myWord)+i, 0xFFFFFF);
+        // 글자가 일치하는 경우
+        if(wordIndex[i] > 0 && wordIndex[i] == myIndex){
+            wordNum[wordIndex[i]-1] -= 1;
+            wordIndex[i] = 0;
+            keywordColor[cpk+wordLine+i] = 3;
+            skb.keyboardColor[cpb+myIndex-1] = 3;
+        }
+        else{
+            var check = true;
+            // 위치가 일치하지 않지만, 다른 위치에 같은 글자가 있는 경우
+            for (var j=0; j<5; j++){
+                if(wordNum[myIndex-1] > 0){
+                    check = false;
+                    wordNum[myIndex-1] -= 1;
+                    keywordColor[cpk+wordLine+i] = 2;
+                    if(MemoryEPD(EPD(skb.keyboardColor)+cpb+myIndex-1, AtMost, 1)){
+                        skb.keyboardColor[cpb+myIndex-1] = 2;
+                    }
+                    break;
+                }
+            }
+            // 아무것도 해당하지 않는 경우
+            if(check){
+                keywordColor[cpk+wordLine+i] = 1;
+                if(MemoryEPD(EPD(skb.keyboardColor)+cpb+myIndex-1, Exactly, 0)){
+                    skb.keyboardColor[cpb+myIndex-1] = 1;
+                }
+            }
+        }
+    }
+    const t = StringBuffer(1024);
+    t.insert(0, "\x13");
+    // for(var i=0; i<5; i++){t.appendf("{} ", wordIndex[i]);}
+    for (var i=0; i<26; i++){t.appendf("{:s}{:s}",v.colorSet[wordNum[i]], sp.phonemesList[i]);}
+    t.Display();
+    keywordLine[cp] ++;
+    if(keywordLine[cp] == 6){
+        stopKeyword(cp);
+    }
+    keywordIndex[cp] = 0;
+    keywordUpdate[cp] = 1;
+    skb.keyboardUpdate[cp] = 1;
+}
+
+function inputAnswer(cp){
+    if(keywordInput[cp] == 1){
+        keywordInput[cp] = 0;
+        var result = checkKeyword(cp);
+        if(result == 2){
+            DisplayText("\x07！\x04정답입니다.");
+            stopKeyword(cp);
+            psb.calculateScore(cp);
+            nextLine(cp);
+        }
+        else if(result == 1){
+            DisplayText("\x07！\x04검색결과, wordList에 있는 단어입니다.");
+            nextLine(cp);
+        }
+        else{
+            DisplayText("\x08！\x04검색결과, wordList에 없는 단어입니다.");
+        }
+    }
+}
+
+function inputKeyword(cp){
+    const cpk = cp*keywordNumber;
+    for (var i=0; i<sp.phonemesNumber; i++){
+        if(Deaths(cp, Exactly, sp.phonemesKeys[i], sp.phonemesName[i])){
+            if (keywordIndex[cp] < 5){
+                const lines = keywordLine[cp]*5;
+                keywordArray[cpk+lines+keywordIndex[cp]] = i+1;
+                keywordIndex[cp] ++;
+                keywordUpdate[cp] = 1;
+                if(keywordIndex[cp] == 5){keywordInput[cp] = 12;}
+                PlayWAV("staredit\\wav\\elec-comp-keyboard-key1.wav");
+            }
+        }
+    }
+}
+
+function deleteKeyword(cp){
+    const cpk = cp*keywordNumber;
+    if(Deaths(cp, Exactly, 2, "A Key4")){
+        if(keywordIndex[cp] > 0 && keywordDelay[cp] == 0){
+            const lines = keywordLine[cp]*5;
+            keywordInput[cp] = 0;
+            keywordDelay[cp] = 6;
+            keywordIndex[cp] --;
+            keywordUpdate[cp] = 1;
+            keywordArray[cpk+lines+keywordIndex[cp]] = 0;
+            PlayWAV("staredit\\wav\\elec-comp-keyboard-key2.wav");
+        }
+    }
+    else if(Deaths(cp, Exactly, 0, "A Key4") && keywordDelay[cp] > 0){
+        keywordDelay[cp] = 0;
+    }
+}
+
+function printKeyword(cp){
+    if(keywordUpdate[cp] > 0){
+        keywordUpdate[cp] = 0;
+        const cpk = cp*keywordNumber;
+        s.insert(0);
+        const wordLine = keywordLine[cp];
+        // 이미 입력된 단어 출력하기
+        for (var loop=0; loop<wordLine; loop++){
+            const lines = loop*5;
+            s.appendf("\x13 ");
+            for (var i=0; i<5; i++){
+                s.appendf("{:s}{:s} ", v.colorSet[keywordColor[cpk+lines+i]], sp.phonemesList[keywordArray[cpk+lines+i]-1]);
+            }
+            s.appendf("\n");
+        }
+        if(keywordUse[cp] == 0){
+            // 입력중인 단어
+            s.appendf("\x13\x08▶ ");
+            for (var i=0; i<5; i++){
+                const lines = wordLine*5;
+                if(MemoryEPD(EPD(keywordArray)+cpk+lines+i, Exactly, 0)){
+                    s.appendf("\x1E＿ ");
+                }
+                else{
+                    s.appendf("\x04{:s} ", sp.phonemesList[keywordArray[cpk+lines+i]-1]);
+                }
+            }
+            s.appendf("　");
+        }
+        if(wordLine < 5){
+            for (var i=0; i<5-wordLine; i++){
+                s.appendf("\n"); //\n\x13\x1E ＿ ＿ ＿ ＿ ＿ 
+            }
+        }
+        s.appendf("\n");
+    }
+    s.DisplayAt(0);
+}
+
+function resetKeywordData(){
+    foreach(cp : EUDLoopPlayer(None, Force1)){
+        const cpk = cp*keywordNumber;
+        const cpb = cp*26;
+        for (var i=0; i<keywordNumber; i++){
+            keywordColor[cpk+i] = 0;
+            keywordArray[cpk+i] = 0;
+        }
+        for (var i=0; i<26; i++){
+            skb.keyboardColor[cpb+i] = 0;
+        }
+        keywordIndex[cp] = 0;
+        keywordLine[cp] = 0;
+        keywordUse[cp] = 0;
+    }
+}
+
+function delayTimer(cp){
+    if(keywordDelay[cp]>0){keywordDelay[cp]--;}
+    if(keywordInput[cp]>1){keywordInput[cp]--;}
+}
+
+function keyInputSystem(cp){
+    if(keywordUse[cp] == 0){
+        inputKeyword(cp);
+        deleteKeyword(cp);
+    }
+    printKeyword(cp);
+    //skb.printKeyboard(cp);
+    delayTimer(cp);
+    inputAnswer(cp);
+    eprintf("{:s}", sw.wordList[question]);
+}

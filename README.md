@@ -1,0 +1,1 @@
+* StarCraft : Hanguel Wordle

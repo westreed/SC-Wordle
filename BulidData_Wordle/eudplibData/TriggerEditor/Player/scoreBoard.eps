@@ -1,0 +1,29 @@
+import System.keyInput as ski;
+
+var   clear         = 0;
+const myScore       = PVariable();
+const clearOrder    = PVariable();
+const scoreList     = [10, 8, 7, 5, 3, 2, 1, 0];
+
+const t = StringBuffer();
+
+
+function addScore(cp, value){
+    myScore[cp] += value;
+    SetScore(cp, Add, value, Custom);
+}
+
+function resetScoreData(){
+    clear = 0;
+    for (var i=0; i<8; i++){
+        clearOrder[i] = 0;
+    }
+}
+
+function calculateScore(cp){
+    clearOrder[clear] = cp+1;
+    const scoreValue = scoreList[clear];
+    addScore(cp, scoreValue);
+    clear ++;
+    eprintf("\x17{}등\x04으로 \x08성공\x04하셨습니다! \x1C+{}점",clear, scoreValue);
+}
