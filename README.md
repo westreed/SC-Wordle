@@ -1,1 +1,13 @@
-* StarCraft : Hanguel Wordle
+# StarCraft : Hanguel Wordle
+
+현재 제작되어 있는 형태는 워들의 진행방식과 조금 다릅니다.   
+하루에 1개씩 푸는게 기존의 워들이지만, 해당 유즈맵은   
+문제수를 방장이 정해서 점수를 내는 방식입니다.
+
+## 제작환경
+* EUD Editor 3 최신버전
+* EUD Draft 최신버전
+* 언어 : Epscript
+
+## 중요
+* 현재 코드를 그대로 컴파일해서 플레이하면, 버그가 존재합니다.

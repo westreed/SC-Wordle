@@ -1,0 +1,10 @@
+import TriggerEditor.BGMPlayer as BGM;
+import variables as v;
+
+function playMusic(cp){
+    if(v.gameBGM[cp] == 0){if(IsUserCP()) BGM.Play();}
+    if(Deaths(cp, Exactly, 8, "A Key4")){
+        v.gameBGM[cp] = !v.gameBGM[cp];
+        PlayWAV("staredit\\wav\\switch3.wav");
+    }
+}

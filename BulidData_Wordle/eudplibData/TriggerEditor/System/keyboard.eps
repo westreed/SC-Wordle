@@ -1,55 +1,35 @@
-// import HexDot.DatEdit as hde;
-// import HexDot.HexDotMatrix as hdm;
-// import HexDot.Renderer as hdr;
 import System.phonemes as sp;
 import variables as v;
 
 const k = StringBuffer(1024);
+const keyboardUse       = PVariable();
 const keyboardColor     = EUDArray(8*26);
 const keyboardUpdate    = PVariable();
 
-function printKeyboard(cp){
-    if(keyboardUpdate[cp] > 0){
-        keyboardUpdate[cp] = 0;
-        k.insert(0);
-        k.appendf("\x13");
-        for (var i=0; i<=9; i++){
-            k.appendf("{:s}{:s} ", v.colorSet[keyboardColor[i]], sp.phonemesList[i]);
-        }
-        k.appendf("\n\x13");
-        for (var i=10; i<=18; i++){
-            k.appendf("{:s}{:s} ", v.colorSet[keyboardColor[i]], sp.phonemesList[i]);
-        }
-        k.appendf("\n\x13\x04Enter ");
-        for (var i=19; i<=25; i++){
-            k.appendf("{:s}{:s} ", v.colorSet[keyboardColor[i]], sp.phonemesList[i]);
-        }
-        k.appendf(" \x04Delete");
-    }
-    k.DisplayAt(7);
+function removeKeyboard(cp){
+    k.printfAt(7, "\n\n\x13");
 }
 
-
-// const keyboardX = [131*32,131*32,133*32];
-// const keyboardY = [128*32,130*32,132*32];
-// function printKeyboard(cp){
-//     RemoveUnit(184, P12);
-//     //0~9
-//     hdr.ImageOffset(keyboardX[0], keyboardY[0]);
-//     for (var i=0; i<=9; i++){
-//         hdr.DisplayDot(cp, sp.phonemesOrder[i]);
-//         hdr.addImageOffset(32, 0);
-//     }
-//     //10~18
-//     hdr.ImageOffset(keyboardX[1], keyboardY[1]);
-//     for (var i=10; i<=18; i++){
-//         hdr.DisplayDot(cp, sp.phonemesOrder[i]);
-//         hdr.addImageOffset(32, 0);
-//     }
-//     //19~25
-//     hdr.ImageOffset(keyboardX[2], keyboardY[2]);
-//     for (var i=19; i<=25; i++){
-//         hdr.DisplayDot(cp, sp.phonemesOrder[i]);
-//         hdr.addImageOffset(32, 0);
-//     }
-// }
+function printKeyboard(cp){
+    if(keyboardUse[cp] == 0){
+        if(keyboardUpdate[cp] > 0){
+            keyboardUpdate[cp] = 0;
+            const cpb = cp*26;
+            k.insert(0);
+            k.appendf("\x13");
+            for (var i=0; i<=9; i++){
+                k.appendf("{:s}{:s} ", v.colorSet[keyboardColor[cpb+i]], sp.phonemesList[i]);
+            }
+            k.appendf("\n\x13");
+            for (var i=10; i<=18; i++){
+                k.appendf("{:s}{:s} ", v.colorSet[keyboardColor[cpb+i]], sp.phonemesList[i]);
+            }
+            k.appendf("\n\x13\x04Enter ");
+            for (var i=19; i<=25; i++){
+                k.appendf("{:s}{:s} ", v.colorSet[keyboardColor[cpb+i]], sp.phonemesList[i]);
+            }
+            k.appendf(" \x04Delete");
+        }
+        k.DisplayAt(7);
+    }
+}

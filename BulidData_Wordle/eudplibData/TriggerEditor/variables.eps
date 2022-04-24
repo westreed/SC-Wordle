@@ -1,5 +1,35 @@
 
 
+var   gameTimer     = 90;
+var   gameQuestion  = 10;
 var   superUser     = 0;
 var   userNumber    = 0;
-const colorSet      = [Db("\x04"), Db("\x1E"), Db("\x17"), Db("\x07")];
+const colorSet      = [Db("\x04"), Db("\x15"), Db("\x17"), Db("\x07")];
+const colorSet2     = [Db("\x1D"), Db("\x08")];
+const gameBGM       = PVariable();
+
+function mainPlayer(){
+    var uN = 0;
+    foreach(cp : EUDLoopPlayer("Human")){
+        uN += 1;
+        if(Deaths(Force1, Exactly, 0, 215)){
+            SetDeaths(cp, SetTo, 1, 215);
+            SetVariables(superUser, cp);
+        }
+    }
+    if(userNumber != uN){
+        SetVariables(userNumber, uN);
+    }
+}
+
+function Moderator(){
+    const b = 0x6D0F78; //방장닉
+    foreach(cp : EUDLoopPlayer('Human', None, None)){
+        const d = 0x57EEEB + cp * 36;
+        if(strcmp(b, d) == 0){
+            SetVariables(superUser, cp);
+            SetDeaths(cp, SetTo, 1, 215);
+            break;
+        }
+    }
+}

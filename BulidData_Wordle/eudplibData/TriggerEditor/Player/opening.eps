@@ -1,0 +1,191 @@
+import Player.mouseTracking as pmt;
+import System.gameIng as sgi;
+import variables as v;
+
+const col = EUDArray(5);
+var colorU = 0; var update = 0;
+
+const t = StringBuffer(1024);
+var   openingStep   = 0;
+var   openingDelay  = 0;
+const textline      = Db("\x1C━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
+function setColor(c){
+    for(var i=0; i<5; i++){col[i] = 0;}
+    if(c < 5){col[c] = 1; colorU = 1;}
+    else{colorU = 0;}
+    update = 1;
+}
+
+function setMissionObj(){
+    const a = StringBuffer(1024);
+    a.insert(0);
+    a.appendf("\x13\x1D게임 풀이 방법\n");
+    a.appendf("\n");
+    a.appendf("\x13\x1EWORDLE\x04을 6번 만에 맞춰보세요.\n");
+    a.appendf("\x13\x04시도의 결과는 글자의 \x17색 변화\x04로 나타납니다.\n");
+    a.appendf("\x13\x1Cㅖ\x04는 \x1Bㅔㅔ\x04와 같이 풀어 쓰고,\n");
+    a.appendf("\x13\x1Cㅢ\x04는 \x1Bㅡㅣ\x04와 같이 풀어쓰니 주의해 주세요!\n");
+    a.appendf("\x13\n");
+    a.appendf("\x13\x04제작 : 갈대");
+    SetMissionObjectives(a.StringIndex);
+}
+
+function openingAction(cp);
+function openingText(){
+    setcurpl(getuserplayerid());
+    if(openingStep == 0){
+        setMissionObj();
+        openingStep ++;
+    }
+    else if(openingStep == 1){
+        t.insert(0);
+        t.appendf("\x13{:s}\n",textline);
+        t.appendf("\n");
+        t.appendf("\x13\x1D[EUD]\n");
+        t.appendf("\x13\x1CK \x04- \x17W \x04O R D L E\n");
+        t.appendf("\x13\x1E마참내! 한글워들!\n");
+        t.appendf("\n");
+        t.appendf("\x13\x04제작 : 갈대\n");
+        t.appendf("\n");
+        t.appendf("\x13{:s}",textline);
+        openingStep ++;
+    }
+    else if(openingStep == 2){
+        t.DisplayAt(0);
+        eprintf("\x04배경음악은 \x17Insert키\x04를 누르면, 끌 수 있어요.");
+        if(openingDelay < 24*5){openingDelay++;}
+        else{
+            openingDelay = 0;
+            openingStep ++;
+        }
+    }
+    else if(openingStep == 3){
+        t.insert(0);
+        t.appendf("\x13{:s}\n",textline);
+        t.appendf("\x13\x1D게임 풀이 방법\n");
+        t.appendf("\n");
+        t.appendf("\x13\x1EWORDLE\x04을 6번 만에 맞춰보세요.\n");
+        t.appendf("\x13\x04시도의 결과는 글자의 \x17색 변화\x04로 나타납니다.\n");
+        t.appendf("\x13\x1Cㅖ\x04는 \x1Bㅔㅔ\x04와 같이 풀어 쓰고,\n");
+        t.appendf("\x13\x1Cㅢ\x04는 \x1Bㅡㅣ\x04와 같이 풀어쓰니 주의해 주세요!\n");
+        t.appendf("\n");
+        t.appendf("\x13{:s}",textline);
+        openingStep ++;
+    }
+    else if(openingStep == 4){
+        t.DisplayAt(0);
+        if(openingDelay < 24*7){openingDelay++;}
+        else{
+            openingDelay = 0;
+            update = 1;
+            openingStep ++;
+        }
+    }
+    else if(openingStep == 5){
+        setcurpl(v.superUser);
+        const mmX = pmt.mouseX+320-pmt.screenSizeX;
+	    const mmY = pmt.mouseY;
+        if(176 <= mmY && mmY <= 187 && 263 <= mmX && mmX <= 275){setColor(0);}
+        else if(176 <= mmY && mmY <= 187 && 365 <= mmX && mmX <= 377){setColor(1);}
+        else if(192 <= mmY && mmY <= 204 && 263 <= mmX && mmX <= 275){setColor(2);}
+        else if(192 <= mmY && mmY <= 204 && 365 <= mmX && mmX <= 377){setColor(3);}
+        else if(208 <= mmY && mmY <= 220 && 298 <= mmX && mmX <= 342){setColor(4);}
+        else if(colorU){setColor(5);}
+        openingAction(v.superUser);
+        setcurpl(getuserplayerid());
+        if(update){
+            update = 0;
+            t.insert(0);
+            t.appendf("\x13{:s}\n",textline);
+            t.appendf("\n");
+            t.appendf("\x13{0:c}{0:n}\x04님께서 게임설정을 진행해주세요.\n", v.superUser);
+            t.appendf("\n");
+            t.appendf("\x13{:s}◀  \x04문제갯수(\x17{}문\x04)  {:s}▶\n",v.colorSet2[col[0]],v.gameQuestion,v.colorSet2[col[1]]);
+            t.appendf("\x13{:s}◀  \x04문제시간(\x17{}초\x04)  {:s}▶\n",v.colorSet2[col[2]],v.gameTimer,v.colorSet2[col[3]]);
+            t.appendf("\x13{:s}시작하기\n",v.colorSet2[col[4]]);
+            t.appendf("\n");
+            t.appendf("\x13{:s}\n",textline);
+            t.appendf("\x13\x1EShift키를 누르고 클릭하면, 증가단위가 변경되요.");
+        }
+        t.DisplayAt(0);
+        eprintf("\x04마우스를 움직여서 \x1E왼쪽클릭\x04으로 설정할 수 있습니다.");
+    }
+    else if(openingStep == 6){
+        sgi.removeText();
+        SetVariables(sgi.gameStep, 1);
+    }
+    setcurpl(v.superUser);
+}
+
+function openingAction(cp){
+    if(pmt.mouseClick[cp] == 1){
+        const mmX = pmt.mouseUserX[cp]+320-pmt.screenUserX[cp];
+        const mmY = pmt.mouseUserY[cp];
+        // 문제갯수 내리기
+        if(176 <= mmY && mmY <= 187 && 263 <= mmX && mmX <= 275){
+            if(Deaths(cp, Exactly, 4, "A Key4")){
+                if(v.gameQuestion > 5){SetVariables(v.gameQuestion, v.gameQuestion-5);}
+                else{SetVariables(v.gameQuestion, 1);}
+            }
+            else{
+                if(v.gameQuestion > 0){SetVariables(v.gameQuestion, v.gameQuestion-1);}
+            }
+            setcurpl(getuserplayerid());
+            PlayWAV("staredit\\wav\\switch3.wav");
+            setcurpl(cp);
+            update = 1;
+        }
+        // 문제갯수 늘리기
+        else if(176 <= mmY && mmY <= 187 && 365 <= mmX && mmX <= 377){
+            if(Deaths(cp, Exactly, 4, "A Key4")){
+                if(v.gameQuestion <= 95){SetVariables(v.gameQuestion, v.gameQuestion+5);}
+                else{SetVariables(v.gameQuestion, 100);}
+            }
+            else{
+                if(v.gameQuestion < 99){SetVariables(v.gameQuestion, v.gameQuestion+1);}
+            }
+            setcurpl(getuserplayerid());
+            PlayWAV("staredit\\wav\\switch3.wav");
+            setcurpl(cp);
+            update = 1;
+        }
+        // 타이머 줄이기
+        else if(192 <= mmY && mmY <= 204 && 263 <= mmX && mmX <= 275){
+            if(Deaths(cp, Exactly, 4, "A Key4")){
+                if(v.gameTimer >= 40){SetVariables(v.gameTimer, v.gameTimer-10);}
+                else{SetVariables(v.gameTimer, 30);}
+            }
+            else{
+                if(v.gameTimer >= 35){SetVariables(v.gameTimer, v.gameTimer-5);}
+                else{SetVariables(v.gameTimer, 30);}
+            }
+            setcurpl(getuserplayerid());
+            PlayWAV("staredit\\wav\\switch3.wav");
+            setcurpl(cp);
+            update = 1;
+        }
+        // 타이머 늘리기
+        else if(192 <= mmY && mmY <= 204 && 365 <= mmX && mmX <= 377){
+            if(Deaths(cp, Exactly, 4, "A Key4")){
+                if(v.gameTimer <= 290){SetVariables(v.gameTimer, v.gameTimer+10);}
+                else{SetVariables(v.gameTimer, 300);}
+            }
+            else{
+                if(v.gameTimer <= 295){SetVariables(v.gameTimer, v.gameTimer+5);}
+                else{SetVariables(v.gameTimer, 300);}
+            }
+            setcurpl(getuserplayerid());
+            PlayWAV("staredit\\wav\\switch3.wav");
+            setcurpl(cp);
+            update = 1;
+        }
+        // 시작하기
+        else if(208 <= mmY && mmY <= 220 && 298 <= mmX && mmX <= 342){
+            setcurpl(getuserplayerid());
+            PlayWAV("staredit\\wav\\getitem3.wav");
+            setcurpl(cp);
+            openingStep ++;
+        }
+    }
+}

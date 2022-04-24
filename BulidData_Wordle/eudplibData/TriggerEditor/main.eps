@@ -1,21 +1,38 @@
 import PluginVariables as msqcvar;
 import System.gameIng as sgi;
+import System.keyInput as ski;
+import Player.scoreBoard as psb;
+import Player.mouseTracking as pmt;
+import Player.BGMPlay as pbp;
+import variables as v;
+import TriggerEditor.BGMPlayer as BGM;
 
 const t = StringBuffer(1024);
 function onPluginStart(){
 
 	randomize();
+	BGM.loadSound();
+	psb.scoreInit();
+	pmt.variableInit();
+	v.Moderator();
 	foreach(cp : EUDLoopPlayer("Human")){
 		setcurpl(cp);
+		BGM.SetBGM(0);
 	}
 }
 
 function beforeTriggerExec(){
 
 	SetMemory(0x6509A0, SetTo, 0); //EUD터보
-	sgi.gameSystem();
+	foreach(cp : EUDLoopPlayer("Human")){
+		setcurpl(cp);
+		ski.keywordTimer(cp);
+		pmt.checkScreenMouse();
+		pbp.playMusic(cp);
+	}
 }
 
 function afterTriggerExec(){
 
+	sgi.gameSystem();
 }

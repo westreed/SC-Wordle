@@ -17,6 +17,10 @@ __lenAddr__ : 0x58D90C
 
 [MSQC]
 QCDebug : False
+readMode.Exactly(1); MouseDown(L) : mouseClick, 1
+readMode.Exactly(1); MouseDown(L); val, 0x6CDDC4 : mouseUserX
+readMode.Exactly(1); MouseDown(L); val, 0x6CDDC8 : mouseUserY
+readMode.Exactly(1); MouseDown(L); val, screenSizeX : screenUserX
 q; NotTyping : A Key1, 1
 w; NotTyping : A Key1, 2
 e; NotTyping : A Key1, 4
@@ -45,4 +49,6 @@ n; NotTyping : A Key3, 64
 m; NotTyping : A Key3, 128
 `; NotTyping : A Key4, 1
 KeyPress(BACK); NotTyping : A Key4, 2
+KeyPress(Shift); NotTyping : A Key4, 4
+Insert; NotTyping : A Key4, 8
 
